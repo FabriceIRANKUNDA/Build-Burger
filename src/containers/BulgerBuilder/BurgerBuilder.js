@@ -34,7 +34,8 @@ class BulgerBuilder extends Component {
     try {
       const res = await axios({
         method: "GET",
-        url: "https://react-burger-builder-412f5.firebaseio.com/ingredients",
+        url:
+          "https://react-burger-builder-412f5.firebaseio.com/ingredients.json",
       });
       this.setState({ ingredients: res.data });
     } catch (error) {
