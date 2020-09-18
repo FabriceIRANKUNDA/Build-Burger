@@ -22,17 +22,25 @@ class BulgerBuilder extends Component {
   //   this.state = {}
   // }
   state = {
-    ingredients: {
-      salad: 0,
-      bacon: 0,
-      cheese: 0,
-      meat: 0,
-    },
+    ingredients: null,
     totalPrice: 4,
     purchasable: false,
     showOrderSummary: false,
     loading: false,
+    error: false,
   };
+
+  async componentDidMount() {
+    try {
+      const res = await axios({
+        method: "GET",
+        url: "https://react-burger-builder-412f5.firebaseio.com/ingredients",
+      });
+      this.setState({ ingredients: res.data });
+    } catch (error) {
+      this.setState({ error: true });
+    }
+  }
 
   updateShowOrderSummary = () => {
     const updatedshow = !this.state.showOrderSummary;
@@ -118,24 +126,30 @@ class BulgerBuilder extends Component {
       disabledInfo[key] = disabledInfo[key] <= 0;
     }
 
-    let orderSummary = (
-      <OrderSummary
-        ingredients={this.state.ingredients}
-        price={this.state.totalPrice.toFixed(2)}
-        purchaseCancelled={this.purchaseCancelHandler}
-        purchaseContinued={this.purchaseContinueHandler}
-      />
+    let orderSummary = null;
+    let burger = this.state.error ? (
+      <p
+        style={{
+          textAlign: "center",
+          width: "70%",
+          padding: "10px",
+          color: "orangered",
+          border: "1px solid #000",
+          boxShadow: "0 1px 2px rgba(0,0,0,.15)",
+          borderRadius: "10px",
+          fontWeight: "bold",
+          transform: "translateY(150px)",
+          animation: "transform .2s",
+        }}
+      >
+        Ingredients can't be loaded!
+      </p>
+    ) : (
+      <Spinner />
     );
-    if (this.state.loading) orderSummary = <Spinner />;
-    return (
-      <Aux>
-        <Model
-          show={this.state.showOrderSummary}
-          modelClosed={this.purchaseCancelHandler}
-        >
-          {orderSummary}
-        </Model>
-        <div className={classes.BurgerBuilder}>
+    if (this.state.ingredients) {
+      burger = (
+        <Aux>
           <Burger ingredients={this.state.ingredients} />
           <BuildControls
             ingredientAdded={this.addIngredientHandler}
@@ -146,7 +160,29 @@ class BulgerBuilder extends Component {
             purchasable={this.state.purchasable}
             showOrderSummary={this.updateShowOrderSummary}
           />
-        </div>
+        </Aux>
+      );
+
+      orderSummary = (
+        <OrderSummary
+          ingredients={this.state.ingredients}
+          price={this.state.totalPrice.toFixed(2)}
+          purchaseCancelled={this.purchaseCancelHandler}
+          purchaseContinued={this.purchaseContinueHandler}
+        />
+      );
+    }
+    if (this.state.loading) orderSummary = <Spinner />;
+
+    return (
+      <Aux>
+        <Model
+          show={this.state.showOrderSummary}
+          modelClosed={this.purchaseCancelHandler}
+        >
+          {orderSummary}
+        </Model>
+        <div className={classes.BurgerBuilder}>{burger}</div>
       </Aux>
     );
   }
