@@ -6,6 +6,7 @@ import BuildControls from "../../components/Burger/BuildControls/BuildControls";
 import Model from "../../components/UI/Model/Model";
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary";
 import Spinner from "../../components/UI/Spinner/Spinner";
+import withErrorHandler from "../../hoc/WithErrorHandler/WithErrorHandler";
 import classes from "./BurgerBuilder.css";
 
 const INGREDIENTS_PRICES = {
@@ -151,4 +152,4 @@ class BulgerBuilder extends Component {
   }
 }
 
-export default BulgerBuilder;
+export default withErrorHandler(BulgerBuilder, axios);
