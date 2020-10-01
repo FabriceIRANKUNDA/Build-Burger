@@ -34,8 +34,7 @@ class BulgerBuilder extends Component {
     try {
       const res = await axios({
         method: "GET",
-        url:
-          "https://react-burger-builder-412f5.firebaseio.com/ingredients.json",
+        url: "/ingredients.json",
       });
       this.setState({ ingredients: res.data });
     } catch (error) {
@@ -51,34 +50,22 @@ class BulgerBuilder extends Component {
   purchaseCancelHandler = () => {
     this.setState({ showOrderSummary: false });
   };
-  purchaseContinueHandler = async () => {
+  purchaseContinueHandler = () => {
     // alert("You pressed continue!");
-    this.setState({ loading: true });
-    const orders = {
-      ingredients: this.state.ingredients,
-      price: this.state.totalPrice,
-      customer: {
-        name: "IRANKUNDA Fabrice",
-        address: {
-          street: "KG 121st",
-          zipCode: "3526",
-          country: "Rwanda",
-        },
-        email: "testit@mailsac.com",
-      },
-      deliveryMethod: "Fastest",
-    };
-    try {
-      await axios({
-        method: "POST",
-        url: "/orders.json",
-        data: orders,
-      });
-
-      this.setState({ loading: false, showOrderSummary: false });
-    } catch (error) {
-      this.setState({ loading: false, showOrderSummary: false });
+    const queryParams = [];
+    for (let i in this.state.ingredients) {
+      queryParams.push(
+        encodeURIComponent(i) +
+          "=" +
+          encodeURIComponent(this.state.ingredients[i])
+      );
     }
+    queryParams.push("price=" + this.state.totalPrice.toFixed(2));
+    const queryString = queryParams.join("&");
+    this.props.history.push({
+      pathname: "/checkout",
+      search: "?" + queryString,
+    });
   };
 
   updatePurchasable = (ingredients) => {
