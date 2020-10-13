@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import * as actionTypes from "../../store/actions";
 import axios from "../../axios-orders";
 import Aux from "../../hoc/Auxilliary/Auxilliary";
 import Burger from "../../components/Burger/Burger";
@@ -9,21 +11,12 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import withErrorHandler from "../../hoc/WithErrorHandler/WithErrorHandler";
 import classes from "./BurgerBuilder.css";
 
-const INGREDIENTS_PRICES = {
-  salad: 0.5,
-  bacon: 0.4,
-  cheese: 0.7,
-  meat: 1.5,
-};
-
 class BulgerBuilder extends Component {
   // constructor(props){
   //   super(props);
   //   this.state = {}
   // }
   state = {
-    ingredients: null,
-    totalPrice: 4,
     purchasable: false,
     showOrderSummary: false,
     loading: false,
@@ -31,15 +24,15 @@ class BulgerBuilder extends Component {
   };
 
   async componentDidMount() {
-    try {
-      const res = await axios({
-        method: "GET",
-        url: "/ingredients.json",
-      });
-      this.setState({ ingredients: res.data });
-    } catch (error) {
-      this.setState({ error: true });
-    }
+    // try {
+    //   const res = await axios({
+    //     method: "GET",
+    //     url: "/ingredients.json",
+    //   });
+    //   this.setState({ ingredients: res.data });
+    // } catch (error) {
+    //   this.setState({ error: true });
+    // }
   }
 
   updateShowOrderSummary = () => {
@@ -52,20 +45,17 @@ class BulgerBuilder extends Component {
   };
   purchaseContinueHandler = () => {
     // alert("You pressed continue!");
-    const queryParams = [];
-    for (let i in this.state.ingredients) {
-      queryParams.push(
-        encodeURIComponent(i) +
-          "=" +
-          encodeURIComponent(this.state.ingredients[i])
-      );
-    }
-    queryParams.push("price=" + this.state.totalPrice.toFixed(2));
-    const queryString = queryParams.join("&");
-    this.props.history.push({
-      pathname: "/checkout",
-      search: "?" + queryString,
-    });
+    // const queryParams = [];
+    // for (let i in this.state.ingredients) {
+    //   queryParams.push(
+    //     encodeURIComponent(i) +
+    //       "=" +
+    //       encodeURIComponent(this.state.ingredients[i])
+    //   );
+    // }
+    // queryParams.push("price=" + this.state.totalPrice.toFixed(2));
+    // const queryString = queryParams.join("&");
+    this.props.history.push("/checkout");
   };
 
   updatePurchasable = (ingredients) => {
@@ -75,41 +65,41 @@ class BulgerBuilder extends Component {
       })
       .reduce((acc, el) => acc + el, 0);
 
-    this.setState({ purchasable: sum > 0 });
+    return sum > 0;
   };
 
-  addIngredientHandler = (type) => {
-    const oldCount = this.state.ingredients[type];
-    const updatedCount = oldCount + 1;
-    const updatedIngredients = { ...this.state.ingredients };
-    updatedIngredients[type] = updatedCount;
+  // addIngredientHandler = (type) => {
+  //   const oldCount = this.state.ingredients[type];
+  //   const updatedCount = oldCount + 1;
+  //   const updatedIngredients = { ...this.state.ingredients };
+  //   updatedIngredients[type] = updatedCount;
 
-    const oldPrice = this.state.totalPrice;
-    const newPrice = oldPrice + INGREDIENTS_PRICES[type];
+  //   const oldPrice = this.state.totalPrice;
+  //   const newPrice = oldPrice + INGREDIENTS_PRICES[type];
 
-    this.setState({ totalPrice: newPrice, ingredients: updatedIngredients });
-    this.updatePurchasable(updatedIngredients);
-  };
+  //   this.setState({ totalPrice: newPrice, ingredients: updatedIngredients });
+  //   this.updatePurchasable(updatedIngredients);
+  // };
 
-  removeIngredientHandler = (type) => {
-    const oldCount = this.state.ingredients[type];
-    if (oldCount <= 0) return;
-    const updatedCount = oldCount - 1;
-    const updatedIngredients = { ...this.state.ingredients };
-    updatedIngredients[type] = updatedCount;
+  // removeIngredientHandler = (type) => {
+  //   const oldCount = this.state.ingredients[type];
+  //   if (oldCount <= 0) return;
+  //   const updatedCount = oldCount - 1;
+  //   const updatedIngredients = { ...this.state.ingredients };
+  //   updatedIngredients[type] = updatedCount;
 
-    const oldPrice = this.state.totalPrice;
-    const newPrice = oldPrice - INGREDIENTS_PRICES[type];
+  //   const oldPrice = this.state.totalPrice;
+  //   const newPrice = oldPrice - INGREDIENTS_PRICES[type];
 
-    this.setState({
-      totalPrice: newPrice,
-      ingredients: updatedIngredients,
-    });
-    this.updatePurchasable(updatedIngredients);
-  };
+  //   this.setState({
+  //     totalPrice: newPrice,
+  //     ingredients: updatedIngredients,
+  //   });
+  //   this.updatePurchasable(updatedIngredients);
+  // };
 
   render() {
-    const disabledInfo = { ...this.state.ingredients };
+    const disabledInfo = { ...this.props.ings };
     for (let key in disabledInfo) {
       disabledInfo[key] = disabledInfo[key] <= 0;
     }
@@ -135,17 +125,17 @@ class BulgerBuilder extends Component {
     ) : (
       <Spinner />
     );
-    if (this.state.ingredients) {
+    if (this.props.ings) {
       burger = (
         <Aux>
-          <Burger ingredients={this.state.ingredients} />
+          <Burger ingredients={this.props.ings} />
           <BuildControls
-            ingredientAdded={this.addIngredientHandler}
-            ingredientRemoved={this.removeIngredientHandler}
+            ingredientAdded={this.props.onIngredientAdded}
+            ingredientRemoved={this.props.onIngredientRemoved}
             disabled={disabledInfo}
-            price={this.state.totalPrice}
+            price={this.props.totalPrice}
             // buttonDisabled={this.state.totalPrice === 4}
-            purchasable={this.state.purchasable}
+            purchasable={this.updatePurchasable(this.props.ings)}
             showOrderSummary={this.updateShowOrderSummary}
           />
         </Aux>
@@ -153,8 +143,8 @@ class BulgerBuilder extends Component {
 
       orderSummary = (
         <OrderSummary
-          ingredients={this.state.ingredients}
-          price={this.state.totalPrice.toFixed(2)}
+          ingredients={this.props.ings}
+          price={this.props.totalPrice.toFixed(2)}
           purchaseCancelled={this.purchaseCancelHandler}
           purchaseContinued={this.purchaseContinueHandler}
         />
@@ -176,4 +166,23 @@ class BulgerBuilder extends Component {
   }
 }
 
-export default withErrorHandler(BulgerBuilder, axios);
+const mapStateToProps = (state) => {
+  return {
+    ings: state.ingredients,
+    totalPrice: state.totalPrice,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onIngredientAdded: (ingredientName) =>
+      dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientName }),
+    onIngredientRemoved: (ingredientName) =>
+      dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientName }),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withErrorHandler(BulgerBuilder, axios));
