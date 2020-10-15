@@ -29,9 +29,14 @@ const order = (props) => {
   return (
     <div className={classes.Order}>
       <p>Ingredients: {ingredientsOutput}</p>
-      <p>
-        Price: <strong>USD {props.price.toFixed(2)}</strong>
-      </p>
+      <div className={classes.Details}>
+        <p>
+          Price: <strong>USD {props.price.toFixed(2)}</strong>
+        </p>
+        <button className={classes.Button} onClick={props.clicked}>
+          DELETE
+        </button>
+      </div>
     </div>
   );
 };
