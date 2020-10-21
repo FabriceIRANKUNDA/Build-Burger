@@ -14,58 +14,68 @@ class Orders extends Component {
   // };
 
   componentDidMount() {
-    this.props.onFetchOrder();
+    this.props.onFetchOrder(this.props.token);
   }
   render() {
     let order = <Spinner />;
     if (!this.props.loading) {
-      order = (
-        <p
-          style={{
-            margin: "0px auto",
-            textAlign: "center",
-            width: "70%",
-            padding: "10px",
-            color: "orangered",
-            border: "1px solid #000",
-            boxShadow: "0 1px 2px rgba(0,0,0,.15)",
-            borderRadius: "10px",
-            fontWeight: "bold",
-            transform: "translateY(150px)",
-            animation: "transform .2s",
-          }}
-        >
-          No orders created! Please make your order.
-        </p>
-      );
-      if (this.props.orders.length !== 0) {
-        order = this.props.orders.map((order) => {
-          return (
-            <Order
-              key={order.id}
-              ingredients={order.ingredients}
-              price={+order.price}
-              clicked={() => this.props.onDeleteorder(order.id)}
-            />
+      if (this.props.orders === null) {
+        order = null;
+      } else {
+        if (this.props.orders.length === 0) {
+          order = (
+            <p
+              style={{
+                margin: "0px auto",
+                textAlign: "center",
+                width: "70%",
+                padding: "10px",
+                color: "orangered",
+                border: "1px solid #000",
+                boxShadow: "0 1px 2px rgba(0,0,0,.15)",
+                borderRadius: "10px",
+                fontWeight: "bold",
+                transform: "translateY(150px)",
+                animation: "transform .2s",
+              }}
+            >
+              No orders created! Please make your order.
+            </p>
           );
-        });
+        }
+        if (this.props.orders.length > 0) {
+          order = this.props.orders.map(order => {
+            return (
+              <Order
+                key={order.id}
+                ingredients={order.ingredients}
+                price={+order.price}
+                clicked={() =>
+                  this.props.onDeleteorder(order.id, this.props.token)
+                }
+              />
+            );
+          });
+        }
       }
     }
     return <div>{order}</div>;
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     orders: state.order.orders,
     loading: state.order.loading,
+    token: state.auth.token,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    onFetchOrder: () => dispatch(actionCreators.fetchOrders()),
-    onDeleteorder: (id) => dispatch(actionCreators.deleteOrder(id)),
+    onFetchOrder: token => dispatch(actionCreators.fetchOrders(token)),
+    onDeleteorder: (id, token) =>
+      dispatch(actionCreators.deleteOrder(id, token)),
   };
 };
 

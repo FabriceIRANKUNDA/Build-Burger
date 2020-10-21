@@ -9,7 +9,7 @@ const purchaseBurgerSucess = (id, orderData) => {
   };
 };
 
-const purchaseBurgerFail = (error) => {
+const purchaseBurgerFail = error => {
   return {
     type: actionTypes.PURCHASE_BURGER_FAIL,
     error,
@@ -20,13 +20,13 @@ export const purchaseBurgerStart = () => {
     type: actionTypes.PURCHASE_BURGER_START,
   };
 };
-export const purchaseBurger = (orderData) => {
-  return async (dispatch) => {
+export const purchaseBurger = (orderData, token) => {
+  return async dispatch => {
     dispatch(purchaseBurgerStart());
     try {
       const res = await axios({
         method: "POST",
-        url: "/orders.json",
+        url: "/orders.json?auth=" + token,
         data: orderData,
       });
       dispatch(purchaseBurgerSucess(res.data.name, res.data));
@@ -48,26 +48,26 @@ const fetchOrdersStart = () => {
   };
 };
 
-const fetchOrdersSuccessed = (orders) => {
+const fetchOrdersSuccessed = orders => {
   return {
     type: actionTypes.FETCH_ORDERS_SUCCESS,
     orders,
   };
 };
 
-const fetchOrdersFail = (error) => {
+const fetchOrdersFail = error => {
   return {
     type: actionTypes.PURCHASE_BURGER_FAIL,
     error,
   };
 };
 
-export const fetchOrders = () => {
-  return async (dispatch) => {
+export const fetchOrders = token => {
+  return async dispatch => {
     dispatch(fetchOrdersStart());
     try {
       const res = await axios({
-        url: "/orders.json",
+        url: "/orders.json?auth=" + token,
         method: "Get",
       });
       const fetchedData = [];
@@ -84,20 +84,20 @@ export const fetchOrders = () => {
   };
 };
 
-const deleteOrderAction = (id) => {
+const deleteOrderAction = id => {
   return {
     type: actionTypes.DELETE_ORDER_SUCCESS,
     id,
   };
 };
 
-export const deleteOrder = (id) => {
-  return async (dispatch) => {
+export const deleteOrder = (id, token) => {
+  return async dispatch => {
     dispatch(fetchOrdersStart());
     try {
       await axios({
         method: "DELETE",
-        url: `/orders/${id}.json`,
+        url: `/orders/${id}.json?auth=${token}`,
       });
       dispatch(deleteOrderAction(id));
     } catch (error) {

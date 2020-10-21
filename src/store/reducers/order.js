@@ -2,7 +2,7 @@ import * as actionTypes from "../actions/actionTypes";
 import { updateObject } from "../utility";
 
 const initialState = {
-  orders: [],
+  orders: null,
   loading: false,
   purchased: false,
 };
@@ -12,11 +12,11 @@ const reducer = (state = initialState, action) => {
     case actionTypes.PURCHASE_INIT:
       return updateObject(state, { purchased: false });
     case actionTypes.PURCHASE_BURGER_SUCCESS:
-      const newOrder = updateObject(action.orderData, { id: action.orderId });
+      // const newOrder = updateObject(action.orderData, { id: action.orderId });
       return updateObject(state, {
         loading: false,
         purchased: true,
-        orders: state.orders.concat(newOrder),
+        // orders: state.orders.concat(newOrder),
       });
     case actionTypes.PURCHASE_BURGER_FAIL:
       return updateObject(state, { loading: false });
@@ -30,9 +30,7 @@ const reducer = (state = initialState, action) => {
     case actionTypes.ACTION_ON_ORDERS_START:
       return updateObject(state, { loading: true });
     case actionTypes.DELETE_ORDER_SUCCESS:
-      const updatedOrder = state.orders.filter(
-        (order) => order.id !== action.id
-      );
+      const updatedOrder = state.orders.filter(order => order.id !== action.id);
       return updateObject(state, { orders: updatedOrder, loading: false });
     default:
       return state;

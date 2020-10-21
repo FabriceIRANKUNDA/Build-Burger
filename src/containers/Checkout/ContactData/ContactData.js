@@ -101,7 +101,7 @@ class ContactData extends Component {
     loading: false,
   };
 
-  orderHandler = async (event) => {
+  orderHandler = async event => {
     event.preventDefault();
 
     const formData = {};
@@ -117,7 +117,7 @@ class ContactData extends Component {
       formData,
     };
 
-    this.props.onOrderBurger(order);
+    this.props.onOrderBurger(order, this.props.token);
   };
   checkvalidity = (value, rules) => {
     let isValid = true;
@@ -160,7 +160,7 @@ class ContactData extends Component {
           elementConfig={this.state.orderForm[key].elementConfig}
           value={this.state.orderForm[key].value}
           label={this.state.orderForm[key].elementConfig.name}
-          changed={(event) => this.inputChangeHandler(event, key)}
+          changed={event => this.inputChangeHandler(event, key)}
           invalid={!this.state.orderForm[key].valid}
           touched={this.state.orderForm[key].touched}
           shouldValidate={this.state.orderForm[key].validation}
@@ -186,18 +186,19 @@ class ContactData extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     ings: state.burgerBuilder.ingredients,
     totalPrice: state.burgerBuilder.totalPrice,
     loading: state.order.loading,
+    token: state.auth.token,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    onOrderBurger: (orderData) =>
-      dispatch(actionCreators.purchaseBurger(orderData)),
+    onOrderBurger: (orderData, token) =>
+      dispatch(actionCreators.purchaseBurger(orderData, token)),
   };
 };
 
