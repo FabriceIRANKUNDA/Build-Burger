@@ -1,0 +1,15 @@
+.Error {
+  width: 40%;
+  height: 80px;
+  position: absolute;
+  top: 5%;
+  left: 25%;
+  background-color: orangered;
+  padding: 30px;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  box-shadow: 0 15px 25px #ccc;
+  transition: all 0.4s;
+}
