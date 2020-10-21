@@ -37,10 +37,12 @@ export const auth = (email, password, isSignUp) => {
     dispatch(authStart());
     try {
       let url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyB98uw-OI7m3aHjkrtJFLO9aCkTD9Em1R8";
+        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" +
+        process.env.REACT_APP_FIREBASE_API_KEY;
       if (!isSignUp)
         url =
-          "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyB98uw-OI7m3aHjkrtJFLO9aCkTD9Em1R8";
+          "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
+          process.env.REACT_APP_FIREBASE_API_KEY;
       const authData = {
         email,
         password,
