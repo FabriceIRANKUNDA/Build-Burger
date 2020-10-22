@@ -35,8 +35,13 @@ class BulgerBuilder extends Component {
   }
 
   updateShowOrderSummary = () => {
-    const updatedshow = !this.state.showOrderSummary;
-    this.setState({ showOrderSummary: updatedshow });
+    if (this.props.isAuthenticated) {
+      const updatedshow = !this.state.showOrderSummary;
+      this.setState({ showOrderSummary: updatedshow });
+    } else {
+      this.props.onSetAuthRedirect("/checkout");
+      this.props.history.push("/auth");
+    }
   };
 
   purchaseCancelHandler = () => {
@@ -58,9 +63,9 @@ class BulgerBuilder extends Component {
     this.props.history.push("/checkout");
   };
 
-  updatePurchasable = (ingredients) => {
+  updatePurchasable = ingredients => {
     const sum = Object.keys(ingredients)
-      .map((ingKey) => {
+      .map(ingKey => {
         return ingredients[ingKey];
       })
       .reduce((acc, el) => acc + el, 0);
@@ -134,6 +139,7 @@ class BulgerBuilder extends Component {
             ingredientRemoved={this.props.onIngredientRemoved}
             disabled={disabledInfo}
             price={this.props.totalPrice}
+            isAuth={this.props.isAuthenticated}
             // buttonDisabled={this.state.totalPrice === 4}
             purchasable={this.updatePurchasable(this.props.ings)}
             showOrderSummary={this.updateShowOrderSummary}
@@ -165,22 +171,25 @@ class BulgerBuilder extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     ings: state.burgerBuilder.ingredients,
     totalPrice: state.burgerBuilder.totalPrice,
     error: state.burgerBuilder.error,
+    isAuthenticated: state.auth.token !== null,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    onIngredientAdded: (ingredientName) =>
+    onIngredientAdded: ingredientName =>
       dispatch(actionCreators.addIngredients(ingredientName)),
-    onIngredientRemoved: (ingredientName) =>
+    onIngredientRemoved: ingredientName =>
       dispatch(actionCreators.removeIngredients(ingredientName)),
     onInitIngredients: () => dispatch(actionCreators.InitIngredients()),
     onPurchaseInit: () => dispatch(actionCreators.purchaseInit()),
+    onSetAuthRedirect: path =>
+      dispatch(actionCreators.setAuthRedirectPath(path)),
   };
 };
 

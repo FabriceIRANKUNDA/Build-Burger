@@ -22,7 +22,12 @@ export const authFail = error => {
   };
 };
 
-export const logout = () => ({ type: actionTypes.AUTH_LOGOUT });
+export const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("expirationDate");
+  localStorage.removeItem("userId");
+  return { type: actionTypes.AUTH_LOGOUT };
+};
 
 export const checkAuthTimeOut = expiresIn => {
   return dispatch => {
@@ -54,6 +59,12 @@ export const auth = (email, password, isSignUp) => {
         data: authData,
       });
       console.log(res);
+      const expirationDate = new Date(
+        new Date().getTime() + res.data.expiresIn * 1000
+      );
+      localStorage.setItem("token", res.data.idToken);
+      localStorage.setItem("expirationDate", expirationDate);
+      localStorage.setItem("userId", res.data.localId);
       dispatch(authSuccess(res.data.idToken, res.data.localId));
       dispatch(checkAuthTimeOut(res.data.expiresIn));
     } catch (error) {
@@ -66,6 +77,29 @@ export const auth = (email, password, isSignUp) => {
       } else {
         dispatch(authFail(error.response.data.error));
       }
+    }
+  };
+};
+
+export const setAuthRedirectPath = path => ({
+  type: actionTypes.SET_AUTH_REDIRECT_PATH,
+  path,
+});
+
+export const checkAuthState = () => {
+  return dispatch => {
+    const token = localStorage.getItem("token");
+    if (!token) dispatch(logout());
+    const expirationDate = new Date(localStorage.getItem("expirationDate"));
+    if (expirationDate <= new Date()) {
+      dispatch(logout);
+    } else {
+      dispatch(authSuccess(token, localStorage.getItem("userId")));
+      dispatch(
+        checkAuthTimeOut(
+          (expirationDate.getTime() - new Date().getTime()) / 1000
+        )
+      );
     }
   };
 };
