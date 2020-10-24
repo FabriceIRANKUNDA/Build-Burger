@@ -58,7 +58,6 @@ export const auth = (email, password, isSignUp) => {
         url,
         data: authData,
       });
-      console.log(res);
       const expirationDate = new Date(
         new Date().getTime() + res.data.expiresIn * 1000
       );
