@@ -11,7 +11,7 @@ import Spinner from "../../components/UI/Spinner/Spinner";
 import withErrorHandler from "../../hoc/WithErrorHandler/WithErrorHandler";
 import classes from "./BurgerBuilder.css";
 
-class BulgerBuilder extends Component {
+export class BurgerBuilder extends Component {
   // constructor(props){
   //   super(props);
   //   this.state = {}
@@ -196,4 +196,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withErrorHandler(BulgerBuilder, axios));
+)(withErrorHandler(BurgerBuilder, axios));
