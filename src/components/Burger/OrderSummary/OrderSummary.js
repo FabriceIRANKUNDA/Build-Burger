@@ -21,10 +21,10 @@ const orderSummary = (props) => {
       </p>
       <p>Continue to checkout?</p>
       <Button btnType={"Danger"} clicked={props.purchaseCancelled}>
-        CANCEL
+        Cancel
       </Button>
       <Button btnType={"Success"} clicked={props.purchaseContinued}>
-        CONTINUE
+        Continue
       </Button>
     </Aux>
   );
